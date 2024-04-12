@@ -12,6 +12,22 @@ void displayTabBoard(int** board, int* P_row, int* P_col){
     }
 }
 
+
+void displayBoard2(int** board, int* P_row, int* P_col){
+    for(int i=0; i<(*P_row); i++){
+        for(int j=0; j<(*P_col); j++){
+            if(board[i][j] == 0){
+                printf(". ");
+            }
+            else if(board[i][j] == 1){
+                printf("😗 ");
+            }
+        }
+        printf("\n");
+    }
+}
+
+
 void displayBoard(int** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_col); i++){
         printf(" ____");
@@ -64,6 +80,8 @@ int** createBoard(int* P_row, int* P_col){
 }
 
 
+
+
 int main(){
     srand(time(NULL));
 
@@ -75,9 +93,11 @@ int main(){
 
     int** board = createBoard(P_row, P_col);
 
+    board[*P_row - 1][0] = 1;
+
     displayTabBoard(board, P_row, P_col);
 
-    displayBoard(board, P_row, P_col);
+    displayBoard2(board, P_row, P_col);
 
     for(int i=0; i < (*P_row); i++){
         free(board[i]);
