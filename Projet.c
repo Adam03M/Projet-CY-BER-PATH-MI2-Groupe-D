@@ -3,74 +3,88 @@
 #include <time.h>
 
 
-void displayTabBoard(int** board, int* P_row, int* P_col){
+
+typedef struct{
+    int x;
+    int y;
+} Player;
+
+
+typedef struct{
+    int value;
+    int walls;
+} Case;
+
+
+void displayTabBoard(Case** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_row); i++){
         for(int j=0; j<(*P_col); j++){
-            printf("[%d] ", board[i][j]);
+            printf("%d ", board[i][j].value);
         }
         printf("\n");
     }
 }
 
 
-void displayBoard2(int** board, int* P_row, int* P_col){
+
+void displayBoard(Case** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_row); i++){
         for(int j=0; j<(*P_col); j++){
-            if(board[i][j] == 0){
-                printf(". ");
+            if(board[i][j].walls == 1 || board[i][j].walls == 2){
+                printf("\e[1;34m");
             }
-            else if(board[i][j] == 1){
-                printf("😗 ");
-            }
+            printf("+----" "\e[0;37m");
         }
-        printf("\n");
-    }
-}
-
-
-void displayBoard(int** board, int* P_row, int* P_col){
-    for(int i=0; i<(*P_col); i++){
-        printf(" ____");
-    }
-    printf("\n");
-    for(int i=0; i<(*P_row); i++){
-        for(int j=0; j<(*P_col) + 1; j++){
-            printf("|    ");
-        }
-        printf("\n");
+        printf("+ \n");
         for(int j=0; j<(*P_col); j++){
-            printf("|____");
-            if(j == (*P_col) - 1){
-                printf("|   ");
+            if(board[i][j].value == 0){
+                printf("|    ");
+            }
+            else if(board[i][j].value == 20){
+                printf("| P1 ");
+            }
+            else if(board[i][j].value == 5){
+                printf("| 5  ");
             }
         }
-        printf("\n");
+        printf("| \n");
     }
+    for(int j=0; j<(*P_col); j++){
+        printf("+----");
+    }
+    printf("+ \n");
     
 }
 
 
-void initBoard(int** board, int* P_row, int* P_col){
+
+void createWalls(Case** board, int* P_row, int* P_col){
+    board[14][3].value = 5;
+    board[14][3].walls = 1;
+}
+
+
+void initBoard(Case** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_row); i++){
         for(int j=0; j<(*P_col); j++){
-            board[i][j] = 0;
+            board[i][j].value = 0;
         }
     }
 }
 
 
-int** createBoard(int* P_row, int* P_col){
+Case** createBoard(int* P_row, int* P_col){
     *P_row = rand() % 5 + 15;
     *P_col = rand() % 5 + 15;
     printf("row : %d et col : %d\n", *P_row, *P_col);
 
-    int ** board = malloc(sizeof(int*) * (*P_row));
+    Case** board = malloc(sizeof(*board) * (*P_row));
 
-    for(int i=0; i < (*P_row); i++){
-        board[i] = malloc(sizeof(int) * (*P_col));
+    for(int i = 0; i < (*P_row); i++){
+        board[i] = malloc(sizeof(**board) * (*P_col));
     }
     if(board == NULL){
-        printf("L'allocation de la m�moire pour cr�er le plateau � �chou�e.");
+        printf("L'allocation de la mémoire pour créer le plateau a échouée.\n");
         exit(1);
     }
 
@@ -80,29 +94,87 @@ int** createBoard(int* P_row, int* P_col){
 }
 
 
+int move(Case** board, int* P_row, int* P_col, Player* P1){
+    char userInput;
+    printf("Entrez les touches \"z\" \"q\" \"s\" ou \"d\" pour pour vous déplacer, entrez \"l\" pour quitter le jeu.\n");
+    fflush(stdin);
+    scanf("%c", &userInput);
+
+    switch(userInput){
+        case 'z' :
+            board[(*P1).y][(*P1).x].value = 0;
+            if((*P1).y - 1 >= 0){
+                (*P1).y -= 1;
+            }
+            break;
+        case 'q' :
+            board[(*P1).y][(*P1).x].value = 0;
+            if((*P1).x - 1 >= 0){
+                (*P1).x -= 1;
+            }
+            break;
+        case 's' :
+            board[(*P1).y][(*P1).x].value = 0;
+            if((*P1).y + 1 < *P_row){
+                (*P1).y += 1;
+            }
+            break;
+        case 'd' :
+            board[(*P1).y][(*P1).x].value = 0;
+            if((*P1).x + 1< *P_col){
+                (*P1).x += 1;
+            }
+            break;
+        case 'l' :
+            return -1;
+        default :
+            return 0;
+    }
+    board[(*P1).y][(*P1).x].value = 20;
+    displayTabBoard(board, P_row, P_col);
+    printf("\e[47m");
+    displayBoard(board, P_row, P_col);
+    return 1;
+}
 
 
 int main(){
     srand(time(NULL));
-
     int row = 0;
     int col = 0;
 
     int* P_row = &row;
     int* P_col = &col;
 
-    int** board = createBoard(P_row, P_col);
+    Case** board = createBoard(P_row, P_col);
 
-    board[*P_row - 1][0] = 1;
+    Player P1; 
+
+    P1.x = 0;
+    P1.y = *P_row - 1;
+
+    board[P1.y][P1.x].value = 20;
+
+    createWalls(board, P_row, P_col);
 
     displayTabBoard(board, P_row, P_col);
 
-    displayBoard2(board, P_row, P_col);
+    displayBoard(board, P_row, P_col);
+
+    do{
+        int result = 0;
+        result = move(board, P_row, P_col, &P1);
+        if(result == -1){
+            break;
+        }
+    } while(1);
 
     for(int i=0; i < (*P_row); i++){
         free(board[i]);
     }
     free(board);
+
+    printf("Fini" "\e[0;37m");
 
     return 0;
 }
