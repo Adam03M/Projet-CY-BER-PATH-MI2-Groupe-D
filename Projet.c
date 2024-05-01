@@ -30,10 +30,7 @@ void displayTabBoard(Case** board, int* P_row, int* P_col){
 void displayBoard(Case** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_row); i++){
         for(int j=0; j<(*P_col); j++){
-            if(board[i][j].walls == 1 || board[i][j].walls == 2){
-                printf("\e[1;34m");
-            }
-            printf("+----" "\e[0;37m");
+            printf("+----");
         }
         printf("+ \n");
         for(int j=0; j<(*P_col); j++){
@@ -53,14 +50,12 @@ void displayBoard(Case** board, int* P_row, int* P_col){
         printf("+----");
     }
     printf("+ \n");
-    
 }
 
 
 
 void createWalls(Case** board, int* P_row, int* P_col){
-    board[14][3].value = 5;
-    board[14][3].walls = 1;
+    // Donnez des valeurs aux cases qui auront des murs.
 }
 
 
@@ -132,7 +127,6 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
     }
     board[(*P1).y][(*P1).x].value = 20;
     displayTabBoard(board, P_row, P_col);
-    printf("\e[47m");
     displayBoard(board, P_row, P_col);
     return 1;
 }
@@ -174,7 +168,7 @@ int main(){
     }
     free(board);
 
-    printf("Fini" "\e[0;37m");
+    printf("Fini");
 
     return 0;
 }
