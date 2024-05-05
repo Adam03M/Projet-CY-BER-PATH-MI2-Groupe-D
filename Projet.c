@@ -60,24 +60,29 @@ void displayBoard(Case** board, int* P_row, int* P_col){
 
 void mursCibles(Case** board, int i, int j){
     int mur = rand() % 4;
-    if(mur == 0){
-        board[i][j].walls = 3;
-    }
-    else if(mur == 1){
-        board[i][j].walls = 6;
-    }
-    else if(mur == 1){
-        board[i][j].walls = 12;
-    }
-    else{
-        board[i][j].walls = 9;
+    // On initialise les valeurs des murs de la cible rentré
+    // Les murs ont ces valeurs là pour que l'on puisse par la suite utiliser les bits remplis pour savoir s'il y a un mur
+    switch(mur){
+        case 0 :
+            board[i][j].walls = 3;
+            break;
+        case 1 :
+            board[i][j].walls = 6;
+            break;
+        case 2 :
+            board[i][j].walls = 12;
+            break;
+        case 3 :
+            board[i][j].walls = 9;
+            break;
     }
 }
 
 int cibleAutorise(Case** board, int i, int j){
+    // On parcours les cases autour de la case rentrer en paramètre pour pas mettre 2 cibles côte à côte
     for(int a=-1; a<2; a++){
         for(int b=-1; b<2; b++){
-            if((board[i + a][j + b].value != 0) && (i != 0 || j != 0)){
+            if(board[i + a][j + b].value != 0){
                 return 0;
             }
         }
@@ -88,10 +93,13 @@ int cibleAutorise(Case** board, int i, int j){
 void creerCibles(Case** board, int* P_row, int* P_col){
     int nb_cibles = 0;
     int aleatoire;
+    // On boucle tant que toutes les cibles ne sont pas placées
     while(nb_cibles < 18){
         for(int i=1; i < (*P_row) - 1; i++){
             for(int j=1; j < (*P_col) - 1; j++){
-                aleatoire = rand() % 40;
+                // On met un grand nombre aléatoire pour que les numéros des cibles soient bien espacés et donc mélangés dans le tableau
+                aleatoire = rand() % 50;
+                // On vérifie que la cible est une bonne case
                 if(aleatoire == 1 && cibleAutorise(board, i, j) == 1){
                     board[i][j].value = nb_cibles + 1;
                     mursCibles(board, i, j);
