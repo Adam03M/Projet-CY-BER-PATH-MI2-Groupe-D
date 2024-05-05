@@ -15,6 +15,20 @@ typedef struct{
     int walls;
 } Case;
 
+void SideWalls(Case** board, int* P_row, int* P_col){
+    
+    for(int i=0;i<P_row;i++){
+        for(int j=0;j<P_col;j++){
+            if(i==0 || i==P_row-1 || j==0 || j == P_col -1 ){
+                board[i][j].walls = rand()%2;    
+            }
+            else{             
+                board[i][j].walls = 0;                
+            }
+        }                
+    }
+}
+
 
 void displayTabBoard(Case** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_row); i++){
