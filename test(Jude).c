@@ -3,58 +3,51 @@
 #include <time.h>
 
 
-typedef struct {
-    int x;
-    int y;
+// Cette fonction verifie si il y'a un mur et empêche le joueur d'avancer si tel est le cas
+void PlayerWalls(Case** board, int* P_row, int* P_col,Player*P1){
+     
     
-} Cible;
-
-
-void Cadrillage(int** tab,int col, int line){
-    
-    tab =  malloc(sizeof(int)*line);
-    
-    if(tab == NULL){
-        
-        exit(1);
-        
-    }
-    for(int i=0;i<line;i++){
-        
-        tab[i] = malloc(sizeof(int)*col);
-        
-    }
-    for(int k=0;k<line;k++){
-        
-        for(int j=0;j<col;j++){
-            tab[k][j] = 0;
-            printf("|_");
+    for(int i=0;i<*(P_row);i++){ // Parcours des lignes
+        for(int j=0;j<*(P_col);j++){ // Parcours des colonnes
+         
+            if(board[i][j].walls==1){ // Vérification de la présence du mur
+                
+                printf("Vous ne pouvez pas avancer, il y'a un mur!"); // Message d'erreur
+                
+                
+            }
+            else{
+                
+                printf("P1"); // Le joueur est autorisé à avancer
+                
+            }
+            
         }
-        printf("|\n");
-        
-    }
-}
-
-int afficherCible(){
-   
-    if(){
-        
     }
     
-    
-    return 0;
 }
 
 
-
-
-int main(){
-    srand(time(NULL));
-    int a = rand()%6+15;
-    int b = rand()%6+15;
+// Cette fonction créee les murs sur les cotés du cadrillage
+ void SideWalls(Case** board, int* P_row, int* P_col){
     
-    Cadrillage(a,b);
+    for(int i=0;i<*P_row;i++){
+        for(int j=0;j<*P_col;j++){
+            if(i==0 || i==*(P_row-1) || j==0 || j == *(P_col -1) ){
+                board[0][j].walls = rand()%2;  // Création des mur perpendiculaire a gauche
+                board[i][0].walls = rand()%2; // Création des mur perpendiculaire en haut
+                board[i][*P_col-1].walls= rand()%2; // Création des murs perpendiculaires à droite
+                board[*P_row-1][j].walls= rand()%2; // Création des murs perpendiculaires à gauche
+            }
+            else{
+                
+                board[i][j].walls = 0;
+                
+            }
+            
+        }
+        
+        
+    }
     
-
-    return 0;
 }
