@@ -34,7 +34,7 @@ void displayBoard(Case** board, int* P_row, int* P_col){
         }
         printf("+ \n");
         for(int j=0; j<(*P_col); j++){
-            if(board[i][j].value == 20){
+            if(board[i][j].value == 30){
                 printf("| P1 ");
             }
             else if(board[i][j].value < 10 && board[i][j].value > 0){
@@ -119,6 +119,32 @@ void creerCibles(Case** board, int* P_row, int* P_col){
 
 
 
+Player* creerRobots(Case** board, int* P_row, int* P_col){
+    int i = 0;
+    
+    // Creation du tableau de joueurs
+    Player* P = malloc(sizeof(Player) * 4);
+    if(P == NULL){
+        printf("Erreur creation tableau joueurs");
+        exit(1);
+    }
+
+    while(i < 4){
+        P[i].x = rand() % (*P_col);
+        P[i].y = rand() % (*P_row);
+        // Si la case est vide
+        if(board[P[i].y][P[i].x].value == 0){
+            // Place un joueur
+            board[P[i].y][P[i].x].value = i + 20;
+            i++;
+        }
+    }
+    return P;
+}
+
+
+
+
 
 void initBoard(Case** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_row); i++){
@@ -156,6 +182,7 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
     printf("Entrez les touches \"z\" \"q\" \"s\" ou \"d\" pour pour vous déplacer, entrez \"l\" pour quitter le jeu.\n");
     fflush(stdin);
     scanf("%c", &userInput);
+    printf("\033[H\033[2J");
 
     switch(userInput){
         case 'z' :
@@ -187,7 +214,7 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
         default :
             return 0;
     }
-    board[(*P1).y][(*P1).x].value = 20;
+    board[(*P1).y][(*P1).x].value = 30;
     displayTabBoard(board, P_row, P_col);
     displayBoard(board, P_row, P_col);
     return 1;
@@ -198,9 +225,11 @@ int main(){
     srand(time(NULL));
     int row = 0;
     int col = 0;
+    int nb_joueurs = 0;
 
     int* P_row = &row;
     int* P_col = &col;
+    int* P_nb_joueurs = &nb_joueurs;
 
     Case** board = createBoard(P_row, P_col);
 
@@ -209,9 +238,11 @@ int main(){
     P1.x = 0;
     P1.y = *P_row - 1;
 
-    board[P1.y][P1.x].value = 20;
+    board[P1.y][P1.x].value = 30;
 
     creerCibles(board, P_row, P_col);
+
+    Player* tab_robots = creerRobots(board, P_row, P_col, P_nb_joueurs);
 
     displayTabBoard(board, P_row, P_col);
 
