@@ -2,7 +2,15 @@
 #include <stdlib.h>
 #include <time.h>
 
+//Le programme va choisir un robot
+Player* ChooseBot(Case** board, int* P_row, int* P_col){
 
+		Player* a = creerRobots(board, P_row, P_col);
+		int i = rand()%4;
+
+
+	return a[i];
+}
 // Cette fonction verifie si il y'a un mur et empêche le joueur d'avancer si tel est le cas
 void PlayerWalls(Case** board, int* P_row, int* P_col,Player*P1){
      
