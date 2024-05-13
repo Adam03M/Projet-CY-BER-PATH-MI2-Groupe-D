@@ -6,7 +6,7 @@
 Player* ChooseBot(Case** board, int* P_row, int* P_col){
 
 		Player* a = creerRobots(board, P_row, P_col);
-		int i = rand()%4;
+		int i = rand()%4; //Variable des nombres compris en 1 et 4 pour choisir le robot
 
 
 	return a[i];
