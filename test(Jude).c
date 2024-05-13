@@ -2,6 +2,43 @@
 #include <stdlib.h>
 #include <time.h>
 
+
+
+
+//Cette fonction choisi une cible parmis les 18 
+void ChoixCible(Case** board, int* P_row, int* P_col, Player* robots){
+	int cibleChoisie = rand()%18+1;
+	
+	int i=0;
+	int j=0;
+	do{
+	for(i=0;i<*(P_row);i++){ // Parcours du cadrillage 
+		for(j=0;j<*(P_col);j++){
+				
+				if(board[i][j].value == cibleChoisie){ //Vérification de la présence des 18 cibles
+					for(int k=1;k<=4;k++){ // Parcours du tableau de joueur
+						if(board[i][j]==robots[k]){ // Vérification que la case de la cible n'est pas occupée
+							
+							exit(1);
+						
+						}
+							
+					
+					}
+			
+				return cibleChoisie; //Retour de la cible choisie par le programme
+				}
+			}
+		
+		}		
+	
+	
+	}while(board[i][j].value!=robots); //On répète l'opération tant que la case n'est pas occupé par un robot
+
+	return 0;
+}
+
+
 //Le programme va choisir un robot
 Player* ChooseBot(Case** board, int* P_row, int* P_col){
 
