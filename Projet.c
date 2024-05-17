@@ -16,6 +16,7 @@ typedef struct{
 } Case;
 
 
+// Affiche les nombres du tableau pour voir comment il est rempli
 void displayTabBoard(Case** board, int* P_row, int* P_col){
     for(int i=0; i<(*P_row); i++){
         for(int j=0; j<(*P_col); j++){
@@ -28,32 +29,157 @@ void displayTabBoard(Case** board, int* P_row, int* P_col){
 
 
 void displayBoard(Case** board, int* P_row, int* P_col){
-    for(int i=0; i<(*P_row); i++){
-        for(int j=0; j<(*P_col); j++){
-            printf("+----");
+	// Affiche le jeu ligne par ligne en fonction du tableau
+
+    for (int i = 0; i < (*P_row); i++){
+
+        // Cela va afficher les lignes horrizontales du jeu
+        for (int j = 0; j < (*P_col); j++){
+        	printf("+");
+            // Trouver sur internet, cela permet de vérifier si le 2ème bit de la variable est à 1 ou 0, pour savoir s'il y a un mur à afficher.
+            // Ca commence à 0, donc le bit 1 est celui à la deuxième place
+            // Ici, c'est pour savoir s'il y a un mur en haut de la case
+            if ((board[i][j].walls & (1 << 1)) != 0){
+        		printf("----");
+        	}
+            // Pour afficher les murs en bas d'une case, on regarde la case d'au dessus et on affiche le mur de la case au dessus
+            // Il faut pas que le i soit négatif, et cela ne pose pas de problème car il ne peux pas avoir de mus en bas de la première ligne
+            else if (i != 0){
+                if ((board[i - 1][j].walls & (1 << 3)) != 0){
+                    printf("----");
+                }
+                else{
+        		    printf("    ");
+        	    }
+            }
+        	else{
+        		printf("    ");
+        	}
         }
-        printf("+ \n");
+        printf("+\n");
+
+        // Maintenant on va afficher les murs verticaux et le contenu des cases
         for(int j=0; j<(*P_col); j++){
-            if(board[i][j].value == 30){
-                printf("| P1 ");
+        	
+            // Pour les murs à gauche d'une case
+        	if((board[i][j].walls & (1 << 0)) != 0){
+        		printf("|");
+        	}
+            // Même principe que pour les murs en bas des cases, ici à droite
+            else if (j != 0){
+                if ((board[i][j - 1].walls & (1 << 2)) != 0){
+                    printf("|");
+                }
+                else{
+        		    printf(" ");
+        	    }
+            }
+        	else{
+        		printf(" ");
+        	}
+        	
+            // Maintenant on affiche le contenu
+            if(board[i][j].value >= 20){
+                printf(" R1 ");
             }
             else if(board[i][j].value < 10 && board[i][j].value > 0){
-                printf("| %d  ", board[i][j].value);
+                printf(" %d  ", board[i][j].value);
             }
-            else if(board[i][j].value >= 10){
-                printf("| %d ", board[i][j].value);
+            else if(board[i][j].value >= 10 && board[i][j].value <= 18){
+                printf(" %d ", board[i][j].value);
             }
             else{
-                printf("|    ");
+                printf("    ");
             }
         }
-        printf("| \n");
+        // Pour afficher le mur le plus à droite de la ligne, normalement pas besoin de if, mais on vérifie que le mur de la case a la bonne valeur
+        if((board[i][*P_col - 1].walls & (1 << 2)) != 0){
+    		printf("|");
+        }
+        printf("\n");
     }
-    for(int j=0; j<(*P_col); j++){
-        printf("+----");
+    // La boucle au dessus ne va pas à la toute dernière ligne
+    // Donc on affiche la dernière ligne ici
+    for (int j = 0; j < (*P_col); j++){
+        printf("+");
+        if ((board[*P_row - 1][j].walls & (1 << 3)) != 0){
+    		printf("----");
+    	}
+        else{
+            printf("    ");
+        }
     }
-    printf("+ \n");
+    printf("+\n");
 }
+
+
+
+
+
+
+// Cette fonction verifie si il y'a un mur et empêche le joueur d'avancer si tel est le cas
+void PlayerWalls(Case** board, int* P_row, int* P_col,Player*P1){
+    for(int i=0;i<*(P_row);i++){ // Parcours des lignes
+        for(int j=0;j<*(P_col);j++){ // Parcours des colonnes
+            if(board[i][j].walls==1){ // Vérification de la présence du mur
+                printf("Vous ne pouvez pas avancer, il y'a un mur!"); // Message d'erreur
+            }
+            else{
+                printf("P1"); // Le joueur est autorisé à avancer
+            }
+        }
+    }
+}
+
+
+
+
+
+
+int mursAutorise(Case** board, int* P_row, int* P_col, int mur_haut, int mur_bas, int mur_gauche, int mur_droite){
+    for (int a = -1; a < 2; a++){
+        if ( (board[0][mur_haut + a].walls & (1 << 0) != 0) && (board[*P_row - 1][mur_bas + a].walls & (1 << 0) != 0)){
+            return 0;
+        }
+        else if ( (board[mur_gauche + a][0].walls & (1 << 1) != 0) && (board[mur_droite + a][*P_col - 1].walls & (1 << 1) != 0)){
+            return 0;
+        }
+    }
+    return 1;
+}
+
+
+// Cette fonction créé les murs sur les cotés du cadrillage
+void mursBords(Case** board, int* P_row, int* P_col){
+	for (int i = 0 ; i < *P_row; i++){
+		board[i][0].walls += 1; // Création des mur au bord de gauche
+       	board[i][*P_col-1].walls += 4; // Création des murs au bord de droite
+	}
+    for (int j = 0; j < *P_col; j++){
+        board[0][j].walls += 2;  // Création des mur au bord en haut
+        board[*P_row - 1][j].walls += 8; // Création des murs au bord en bas
+    }
+
+    // On créé les 2 murs parallèles sur chaque bords
+    int i = 0;
+    while(i < 2){
+        int mur_haut = rand() % (*P_col - 4) + 2;
+        int mur_bas = rand() % (*P_col - 4) + 2;
+        int mur_gauche = rand() % (*P_row - 4) + 2;
+        int mur_droite = rand() % (*P_row - 4) + 2;
+
+        // Si il n'y a pas déjà un mur là où on veut le placer
+        if(mursAutorise(board, P_row, P_col, mur_haut, mur_bas, mur_gauche, mur_droite) == 1){
+            board[0][mur_haut].walls += 1;
+            board[*P_row - 1][mur_bas].walls += 1;
+            board[mur_gauche][0].walls += 2;
+            board[mur_droite][*P_col - 1].walls += 2;
+            i++;
+        }
+    }
+}
+
+
 
 
 
@@ -64,25 +190,28 @@ void mursCibles(Case** board, int i, int j){
     // Les murs ont ces valeurs là pour que l'on puisse par la suite utiliser les bits remplis pour savoir s'il y a un mur
     switch(mur){
         case 0 :
-            board[i][j].walls = 3;
+            board[i][j].walls = 1 + 2;
             break;
         case 1 :
-            board[i][j].walls = 6;
+            board[i][j].walls = 2 + 4;
             break;
         case 2 :
-            board[i][j].walls = 12;
+            board[i][j].walls = 4 + 8;
             break;
         case 3 :
-            board[i][j].walls = 9;
+            board[i][j].walls = 8 + 1;
             break;
     }
 }
 
+
 int cibleAutorise(Case** board, int i, int j){
     // On parcours les cases autour de la case rentrer en paramètre pour pas mettre 2 cibles côte à côte
-    for(int a=-1; a<2; a++){
-        for(int b=-1; b<2; b++){
-            if(board[i + a][j + b].value != 0){
+    for (int a = -1; a < 2; a++){
+        for (int b = -1; b < 2; b++){
+            // On regarde si une case autour possède 2 murs, c'est à dire soit une cible, soit les murs parallèles sur les bords
+            // Pour ne pas mettre une cible à côté
+            if ((board[i + a][j + b].walls == (4 + 8)) || (board[i + a][j + b].walls == (8 + 1)) || (board[i + a][j + b].walls == (1 + 2)) || (board[i + a][j + b].walls == (2 + 4))){
                 return 0;
             }
         }
@@ -119,28 +248,21 @@ void creerCibles(Case** board, int* P_row, int* P_col){
 
 
 
-Player* creerRobots(Case** board, int* P_row, int* P_col){
+void creerRobots(Case** board, int* P_row, int* P_col, Player* R){
     int i = 0;
-    
-    // Creation du tableau de joueurs
-    Player* P = malloc(sizeof(Player) * 4);
-    if(P == NULL){
-        printf("Erreur creation tableau joueurs");
-        exit(1);
-    }
 
     while(i < 4){
-        P[i].x = rand() % (*P_col);
-        P[i].y = rand() % (*P_row);
+        R[i].x = rand() % (*P_col);
+        R[i].y = rand() % (*P_row);
         // Si la case est vide
-        if(board[P[i].y][P[i].x].value == 0){
+        if(board[R[i].y][R[i].x].value == 0){
             // Place un joueur
-            board[P[i].y][P[i].x].value = i + 20;
+            board[R[i].y][R[i].x].value = i + 20;
             i++;
         }
     }
-    return P;
 }
+
 
 
 
@@ -182,7 +304,6 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
     printf("Entrez les touches \"z\" \"q\" \"s\" ou \"d\" pour pour vous déplacer, entrez \"l\" pour quitter le jeu.\n");
     fflush(stdin);
     scanf("%c", &userInput);
-    printf("\033[H\033[2J");
 
     switch(userInput){
         case 'z' :
@@ -230,6 +351,9 @@ int main(){
     int* P_row = &row;
     int* P_col = &col;
     int* P_nb_joueurs = &nb_joueurs;
+        
+    // Creation du tableau de joueurs
+    Player R[4];
 
     Case** board = createBoard(P_row, P_col);
 
@@ -240,9 +364,9 @@ int main(){
 
     board[P1.y][P1.x].value = 30;
 
+    mursBords(board, P_row, P_col);
     creerCibles(board, P_row, P_col);
-
-    Player* tab_robots = creerRobots(board, P_row, P_col, P_nb_joueurs);
+    creerRobots(board, P_row, P_col, R);
 
     displayTabBoard(board, P_row, P_col);
 
