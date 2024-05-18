@@ -138,10 +138,10 @@ void PlayerWalls(Case** board, int* P_row, int* P_col,Player*P1){
 
 int mursAutorise(Case** board, int* P_row, int* P_col, int mur_haut, int mur_bas, int mur_gauche, int mur_droite){
     for (int a = -1; a < 2; a++){
-        if ( (board[0][mur_haut + a].walls & (1 << 0) != 0) && (board[*P_row - 1][mur_bas + a].walls & (1 << 0) != 0)){
+        if ( ((board[0][mur_haut + a].walls & (1 << 0)) != 0) || ((board[*P_row - 1][mur_bas + a].walls & (1 << 0)) != 0)){
             return 0;
         }
-        else if ( (board[mur_gauche + a][0].walls & (1 << 1) != 0) && (board[mur_droite + a][*P_col - 1].walls & (1 << 1) != 0)){
+        else if ( ((board[mur_gauche + a][0].walls & (1 << 1)) != 0) || ((board[mur_droite + a][*P_col - 1].walls & (1 << 1)) != 0)){
             return 0;
         }
     }
