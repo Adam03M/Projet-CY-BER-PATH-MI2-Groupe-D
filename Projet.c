@@ -161,8 +161,7 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
 	      nbrmvmt=malloc((*nb_de_joueurs)*sizeof(int));
 	      	if (nbrmvmt == NULL)
 		  {
-			printf
-			  ("L'allocation de la mémoire pour le nombre de mouvement a échouée .\n");
+			printf("L'allocation de la mémoire pour le nombre de mouvement a échouée .\n");
 			exit (5);
 		  }
 	      while(i< (*nb_de_joueurs)){
