@@ -4,6 +4,12 @@
 
 
 
+#define GAUCHE 1
+#define HAUT 2
+#define DROITE 4
+#define BAS 8
+
+
 typedef struct{
     int x;
     int y;
@@ -15,16 +21,6 @@ typedef struct{
     int walls;
 } Case;
 
-
-// Affiche les nombres du tableau pour voir comment il est rempli
-void displayTabBoard(Case** board, int* P_row, int* P_col){
-    for(int i=0; i<(*P_row); i++){
-        for(int j=0; j<(*P_col); j++){
-            printf("%d ", board[i][j].value);
-        }
-        printf("\n");
-    }
-}
 
 
 
@@ -79,8 +75,8 @@ void displayBoard(Case** board, int* P_row, int* P_col){
         	}
         	
             // Maintenant on affiche le contenu
-            if(board[i][j].value >= 20){
-                printf(" R1 ");
+            if(board[i][j].value == 20){
+                printf("\033[41m R1 \033[0m");
             }
             else if(board[i][j].value < 10 && board[i][j].value > 0){
                 printf(" %d  ", board[i][j].value);
@@ -129,7 +125,7 @@ void PlayerWalls(Case** board, int* P_row, int* P_col,Player*P1){
             }
         }
     }
-}
+} 
 
 
 
@@ -137,6 +133,7 @@ void PlayerWalls(Case** board, int* P_row, int* P_col,Player*P1){
 
 
 int mursAutorise(Case** board, int* P_row, int* P_col, int mur_haut, int mur_bas, int mur_gauche, int mur_droite){
+    // On regarde les cases à côtés pour qu'il n'y est pas 2 murs côte à côte ou qui se superposent
     for (int a = -1; a < 2; a++){
         if ( ((board[0][mur_haut + a].walls & (1 << 0)) != 0) || ((board[*P_row - 1][mur_bas + a].walls & (1 << 0)) != 0)){
             return 0;
@@ -152,12 +149,12 @@ int mursAutorise(Case** board, int* P_row, int* P_col, int mur_haut, int mur_bas
 // Cette fonction créé les murs sur les cotés du cadrillage
 void mursBords(Case** board, int* P_row, int* P_col){
 	for (int i = 0 ; i < *P_row; i++){
-		board[i][0].walls += 1; // Création des mur au bord de gauche
-       	board[i][*P_col-1].walls += 4; // Création des murs au bord de droite
+		board[i][0].walls += GAUCHE; // Création des mur au bord de gauche
+       	board[i][*P_col-1].walls += DROITE; // Création des murs au bord de droite
 	}
     for (int j = 0; j < *P_col; j++){
-        board[0][j].walls += 2;  // Création des mur au bord en haut
-        board[*P_row - 1][j].walls += 8; // Création des murs au bord en bas
+        board[0][j].walls += HAUT;  // Création des mur au bord en haut
+        board[*P_row - 1][j].walls += BAS; // Création des murs au bord en bas
     }
 
     // On créé les 2 murs parallèles sur chaque bords
@@ -168,12 +165,12 @@ void mursBords(Case** board, int* P_row, int* P_col){
         int mur_gauche = rand() % (*P_row - 4) + 2;
         int mur_droite = rand() % (*P_row - 4) + 2;
 
-        // Si il n'y a pas déjà un mur là où on veut le placer
+        // Si il n'y a pas déjà un mur là où on veut le placer ou à côté
         if(mursAutorise(board, P_row, P_col, mur_haut, mur_bas, mur_gauche, mur_droite) == 1){
-            board[0][mur_haut].walls += 1;
-            board[*P_row - 1][mur_bas].walls += 1;
-            board[mur_gauche][0].walls += 2;
-            board[mur_droite][*P_col - 1].walls += 2;
+            board[0][mur_haut].walls += GAUCHE;
+            board[*P_row - 1][mur_bas].walls += GAUCHE;
+            board[mur_gauche][0].walls += HAUT;
+            board[mur_droite][*P_col - 1].walls += HAUT;
             i++;
         }
     }
@@ -190,17 +187,17 @@ void mursCibles(Case** board, int i, int j){
     // Les murs ont ces valeurs là pour que l'on puisse par la suite utiliser les bits remplis pour savoir s'il y a un mur
     switch(mur){
         case 0 :
-            board[i][j].walls = 1 + 2;
+            board[i][j].walls = GAUCHE + HAUT;
             break;
         case 1 :
-            board[i][j].walls = 2 + 4;
+            board[i][j].walls = HAUT + DROITE;
             break;
         case 2 :
-            board[i][j].walls = 4 + 8;
+            board[i][j].walls = DROITE + BAS;
             break;
         case 3 :
-            board[i][j].walls = 8 + 1;
-            break;
+            board[i][j].walls = BAS + GAUCHE;
+            break; 
     }
 }
 
@@ -209,9 +206,12 @@ int cibleAutorise(Case** board, int i, int j){
     // On parcours les cases autour de la case rentrer en paramètre pour pas mettre 2 cibles côte à côte
     for (int a = -1; a < 2; a++){
         for (int b = -1; b < 2; b++){
-            // On regarde si une case autour possède 2 murs, c'est à dire soit une cible, soit les murs parallèles sur les bords
+            // On regarde si une case autour possède 2 murs, c'est à dire soit une cible, soit les murs perpendiculaires sur les bords
             // Pour ne pas mettre une cible à côté
-            if ((board[i + a][j + b].walls == (4 + 8)) || (board[i + a][j + b].walls == (8 + 1)) || (board[i + a][j + b].walls == (1 + 2)) || (board[i + a][j + b].walls == (2 + 4))){
+            if ((board[i + a][j + b].walls == (DROITE + BAS)) ||
+            (board[i + a][j + b].walls == (BAS + GAUCHE)) ||
+            (board[i + a][j + b].walls == (GAUCHE + HAUT)) ||
+            (board[i + a][j + b].walls == (HAUT + DROITE))){
                 return 0;
             }
         }
@@ -221,26 +221,18 @@ int cibleAutorise(Case** board, int i, int j){
 
 void creerCibles(Case** board, int* P_row, int* P_col){
     int nb_cibles = 0;
-    int aleatoire;
     // On boucle tant que toutes les cibles ne sont pas placées
     while(nb_cibles < 18){
-        for(int i=1; i < (*P_row) - 1; i++){
-            for(int j=1; j < (*P_col) - 1; j++){
-                // On met un grand nombre aléatoire pour que les numéros des cibles soient bien espacés et donc mélangés dans le tableau
-                aleatoire = rand() % 50;
-                // On vérifie que la cible est une bonne case
-                if(aleatoire == 1 && cibleAutorise(board, i, j) == 1){
-                    board[i][j].value = nb_cibles + 1;
-                    mursCibles(board, i, j);
-                    nb_cibles ++;
-                }
-                if(nb_cibles >= 18){
-                    break;
-                }
-            }
-            if(nb_cibles >= 18){
-                break;
-            }
+        // On prend une case aléatoire du tableau
+        int i = rand() % (*P_row - 3) + 1;
+        int j = rand() % (*P_col - 3) + 1;
+        // On vérifie que la cible est sur une bonne case
+        if(cibleAutorise(board, i, j) == 1){
+            // La valeur de la case est le numéro de la cible
+            board[i][j].value = nb_cibles + 1;
+            // On créer les murs autour de la cible
+            mursCibles(board, i, j);
+            nb_cibles ++;
         }
     }
 }
@@ -336,7 +328,7 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
             return 0;
     }
     board[(*P1).y][(*P1).x].value = 30;
-    displayTabBoard(board, P_row, P_col);
+    printf("\033[H\033[2J");
     displayBoard(board, P_row, P_col);
     return 1;
 }
@@ -367,8 +359,6 @@ int main(){
     mursBords(board, P_row, P_col);
     creerCibles(board, P_row, P_col);
     creerRobots(board, P_row, P_col, R);
-
-    displayTabBoard(board, P_row, P_col);
 
     displayBoard(board, P_row, P_col);
 
