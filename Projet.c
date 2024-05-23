@@ -168,7 +168,12 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
 	          
 	          printf("Donnez le nombre de mouvements nécessaires \n");
 	          scanf("%d",&nbrmvmt[i]);
+		  if(nbrmvmt[i]<= 0){
+			  printf("donnez un autre nombre  \n"); 
+		  }
+		  else{
 	          i++;
+		  }
 	      }
 		return nbrmvmt;
 	  }
