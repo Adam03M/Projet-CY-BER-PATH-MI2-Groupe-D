@@ -12,6 +12,12 @@
 
 
 typedef struct{
+    int x;
+    int y;
+} Player;
+
+
+typedef struct{
     int valeur;
     int murs;
     int robot;
@@ -25,8 +31,7 @@ typedef struct{
 int scanf_int(char* message){
     int ret_var = 0;
     int valeur = 1;
-    while (ret_var != 1 || valeur < 0)
-    {   
+    while (ret_var != 1 || valeur < 0){   
         printf("%s", message);
         ret_var = scanf("%d", &valeur);
         while(getchar()!='\n'){} // Ligne facultative de sécurisation
@@ -38,8 +43,7 @@ int scanf_int(char* message){
 char scanf_char(char* message){
     int ret_var = 0;
     char valeur = 1;
-    while (ret_var != 1 || valeur < 0)
-    {   
+    while (ret_var != 1 || valeur < 0){   
         printf("%s", message);
         ret_var = scanf("%c", &valeur);
         while(getchar()!='\n'){} // Ligne facultative de sécurisation
@@ -330,13 +334,11 @@ int ChoixCible(Case** tab_jeu, int* P_row, int* P_col){
             for(int j = 0; j < *(P_col); j++){
                 // Trouve la cible choisi et vérifie que la case de la cible n'est pas occupée
                 if(tab_jeu[i][j].valeur == cibleChoisie && tab_jeu[i][j].robot == 0){
-                    printf("La cible a été choisi\n");
                     return cibleChoisie; // Retour de la cible choisie par le programme
                 }
             }
         }
         k++;
-        printf("La cible était occupée par un robot, on recommence.\n");
 	} while(k < 20); // On répète l'opération tant que la case n'est pas choisi, où si cela prends trop d'essai, c'est qu'il y a un problème
 
     return -1;
@@ -387,46 +389,87 @@ void chronometre(){
 }
 
 
+int nbDeJoueurs(){
+    int nb_de_joueurs = scanf_int("Donnez le nombre de joueurs pour cette partie.\n");
+	return nb_de_joueurs;
+}
+
+
+int* nbDeMouvement(int nb_de_joueurs){
+    int i = 0;
+    
+	int* nb_mvt = malloc(sizeof(int) * nb_de_joueurs);
+	if (nb_mvt == NULL){
+	    printf("L'allocation de la mémoire pour le nombre de mouvement des joueurs a échouée.\n");
+		exit(5);
+	}
+
+    for(int i = 0; i < nb_de_joueurs; i++){
+
+        // Ici, on n'utilise pas notre fonction "scanf_int" car on a besoin d'écrire le numéro du joueur à chaque demande
+        int ret_var = 0;
+        while (ret_var != 1 || nb_mvt[i] <= 0){   
+            printf("Le joueur %d donne le nombre de coups qu'il pense nécessaire pour atteindre la cible indiquée.\n", (i + 1));
+            ret_var = scanf("%d", &nb_mvt[i]);
+            while(getchar()!='\n'){} // Ligne facultative de sécurisation
+        }
+    }
+    return nb_mvt;
+}
+
+
+void afficheLesChoix(int cibleChoisie, int robotChoisi){
+    char couleurRobot[6];
+    
+    if(robotChoisi == 1){
+        strcpy(couleurRobot,"Rouge");
+    }
+    else if(robotChoisi == 2){
+        strcpy(couleurRobot,"Vert");
+    }
+    else if(robotChoisi == 3){
+        strcpy(couleurRobot,"Bleu");
+    }
+    else{
+        strcpy(couleurRobot,"Cyan");
+    }
+
+    printf("Vous devez vous rendre sur la cible %d en partant du robot %s.\n", cibleChoisie, couleurRobot);
+}
+
 
 // Cette fonction verifie si il y'a un mur et empêche le joueur d'avancer si tel est le cas
 int mursRobot(Case** tab_jeu, int* P_ligne, int* P_col, int x, int y, int sens){
 
-    printf("%d   %d\n", x, y);
-    printf("%d\n", tab_jeu[y][x].murs);
-    printf("%d\n", (tab_jeu[y][x].murs & (1 << 1) != 0));
-    printf("%d\n", (((tab_jeu[y][x].murs & (1 << 1)) != 0) || ((tab_jeu[y - 1][x].murs & (1 << 3)) != 0)));
-    
     /* On vérifie le bit placé à la position 0 pour gauche, 1 pour haut, 2 pour droite, et 3 pour bas
-    afin savoir s'il y a un mur dans la direction vers laquelle le robot va */
+    afin savoir s'il y a des murs en fonction de la direction vers laquelle le robot se dirige */
     if(sens == HAUT){
-        if(((tab_jeu[y][x].murs & (1 << 1)) != 0) || ((tab_jeu[y - 1][x].murs & (1 << 3)) != 0)){ // Mur en haut ou en bas
-            printf("Mur en Haut\n");
+        // Mur en haut ou en bas sur la case au dessus ou un autre robot
+        if(((tab_jeu[y][x].murs & (1 << 1)) != 0) || ((tab_jeu[y - 1][x].murs & (1 << 3)) != 0) || (tab_jeu[y - 1][x].robot != 0)){
             return -1;
         }
     }
     else if(sens == BAS){
-        if(((tab_jeu[y + 1][x].murs & (1 << 1)) != 0) || ((tab_jeu[y][x].murs & (1 << 3)) != 0)){ // Mur en haut ou en bas
-            printf("Mur en Bas\n");
+        // Mur en haut sur la case en dessous ou en bas ou un autre robot
+        if(((tab_jeu[y + 1][x].murs & (1 << 1)) != 0) || ((tab_jeu[y][x].murs & (1 << 3)) != 0) || (tab_jeu[y + 1][x].robot != 0)){
             return -1;
         }
     }
     else if(sens == GAUCHE){
-        if(((tab_jeu[y][x].murs & (1 << 0)) != 0) || ((tab_jeu[y][x - 1].murs & (1 << 2)) != 0)){ // // Mur à gauche ou à droite
-            printf("Mur à gauche\n");
+        // Mur à gauche ou mur à droite sur la case juste à gauche ou un autre robot
+        if(((tab_jeu[y][x].murs & (1 << 0)) != 0) || ((tab_jeu[y][x - 1].murs & (1 << 2)) != 0) || (tab_jeu[y][x - 1].robot != 0)){
             return -1;
         }
     }
     else{
-        if(((tab_jeu[y][x + 1].murs & (1 << 0)) != 0) || ((tab_jeu[y][x].murs & (1 << 2)) != 0)){  // Mur à gauche ou à droite
-            printf("Mur à droite\n");
+        // Mur à gauche ou mur à droite sur la case juste à gauche ou un autre robot
+        if(((tab_jeu[y][x + 1].murs & (1 << 0)) != 0) || ((tab_jeu[y][x].murs & (1 << 2)) != 0) || (tab_jeu[y][x + 1].robot != 0)){
             return -1;
         }
     }
 
-    printf("Le joueur avance 1 fois\n");
     return 1;
 }
-
 
 
 
@@ -480,7 +523,7 @@ int deplacement(Case** tab_jeu, int* P_ligne, int* P_col, int* coordXRobot, int*
 
     // On redonne la valeur du robot à la case, qu'il se soit déplacer ou non
     tab_jeu[*coordYRobot][*coordXRobot].robot = robotChoisi;
-    afficheJeu(tab_jeu, P_ligne, P_col);
+    
 
     return 1;
 }
@@ -488,13 +531,12 @@ int deplacement(Case** tab_jeu, int* P_ligne, int* P_col, int* coordXRobot, int*
 
 
 
-void manche(Case** tab_jeu, int* P_ligne, int* P_col, int* score){
+void manche(Case** tab_jeu, int* P_ligne, int* P_col, int* score, int nb_de_joueurs){
     int nb_deplacement = 1;
     int cibleChoisie = 0;
     int robotChoisi = 0;
     int coordXRobot = -1;
     int coordYRobot = -1;
-    char couleurRobot[10];
 
     int* P_coordXRobot = &coordXRobot;
     int* P_coordYRobot = &coordYRobot;
@@ -514,21 +556,9 @@ void manche(Case** tab_jeu, int* P_ligne, int* P_col, int* score){
         printf("Le robot n'a pas pu être selectionné\n");
         exit(1);
     }
-    else if(robotChoisi == 1){
-        strcpy(couleurRobot,"Rouge");
-    }
-    else if(robotChoisi == 2){
-        strcpy(couleurRobot,"Vert");
-    }
-    else if(robotChoisi == 3){
-        strcpy(couleurRobot,"Bleu");
-    }
-    else{
-        strcpy(couleurRobot,"Cyan");
-    }
 
+    afficheLesChoix(cibleChoisie, robotChoisi);
 
-    printf("Vous devez vous rendre sur la cible %d en partant du robot %s.\n", cibleChoisie, couleurRobot);
 
     // Peut être faire une fonction pour attendre un peu
 
@@ -538,15 +568,21 @@ void manche(Case** tab_jeu, int* P_ligne, int* P_col, int* score){
 
 
     // On lance le chronomètre
+    chronometre();
 
-    // chronometre();
+    // A la fin du chronomètre, on efface l'écran
+    suppr_ecran();
 
     // On demande aux joueurs de rentrer leurs nombres de mouvements
-
+    int* nb_mvt = nbDeMouvement(nb_de_joueurs);
+    for(int i = 0; i < nb_de_joueurs; i++){
+        printf("[%d] ", nb_mvt[i]);
+    }
 
     // Le joueurs avec le plus petit nombre est celui qui joue
 
     do{
+        afficheJeu(tab_jeu, P_ligne, P_col);
         int result = 0;
         result = deplacement(tab_jeu, P_ligne, P_col, P_coordXRobot, P_coordYRobot, robotChoisi);
         nb_deplacement++;
@@ -557,7 +593,7 @@ void manche(Case** tab_jeu, int* P_ligne, int* P_col, int* score){
 
     // En ayant compter le nombre de déplacement avant, on distribut les points aux joueurs en fonction du résultat
 
-
+    free(nb_mvt);
 }
 
 
@@ -568,22 +604,25 @@ int main(){
 
     // On lance la partie
     // On initialise le plateau et tout ce qu'il faut pour le jeu
+
+    int nb_de_joueurs = nbDeJoueurs();
+    // Créé le tableau des scores en fonction du nombre de joueurs de la partie
+    int* score = malloc(sizeof(int) * nb_de_joueurs);
+    if(score == NULL){
+        printf("Erreur malloc tableau des scores.\n");
+        exit(1);
+    }
+
     int ligne = 0;
     int col = 0;
 
-
-    int nb_joueurs = 0;
-    // Il faut creer ce tableau en fonction du nombre de joueurs de la partie
-    int score[4] = {0};
-
-
     int* P_ligne = &ligne;
     int* P_col = &col;
-    int* P_nb_joueurs = &nb_joueurs;
 
     // Le tableau qui contiendra toutes les cases du jeu
     Case** tab_jeu = creerTabJeu(P_ligne, P_col);
 
+    // Placement des murs tout autours du plateau
     mursBords(tab_jeu, P_ligne, P_col);
     mursParalleles(tab_jeu, P_ligne, P_col);
 
@@ -598,7 +637,7 @@ int main(){
 
 
     // On lance une manche du jeu
-    manche(tab_jeu, P_ligne, P_col, score);
+    manche(tab_jeu, P_ligne, P_col, score, nb_de_joueurs);
 
 
     // On affiche les scores et le joueur gagnant
@@ -612,6 +651,7 @@ int main(){
     }
     free(tab_jeu);
 
+    free(score);
 
     printf("Fini\n");
 
