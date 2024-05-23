@@ -167,16 +167,20 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
 	      while(i< (*nb_de_joueurs)){
 	          
 	          printf("Donnez le nombre de mouvements nécessaires \n");
-	          scanf("%d",&nbrmvmt[i]);
-		  if(nbrmvmt[i]<= 0){
-			  printf("donnez un autre nombre  \n"); 
-		  }
-		  else{
+	     	  scanf("%d",&nbrmvmt[i]);
+		    while(nbrmvmt[i]<= 0){
+			  printf("donnez un autre nombre  \n");
+			  scanf("%d",&nbrmvmt[i]);
+	    	    }
 	          i++;
-		  }
 	      }
 		return nbrmvmt;
 	  }
+
+	int*Premier_joueur(int*nb_de_joueurs, int*nbrmvmt){
+	int i=0;
+
+
 
 int main(){
     srand(time(NULL));
