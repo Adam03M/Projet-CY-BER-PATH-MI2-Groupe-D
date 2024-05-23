@@ -12,12 +12,6 @@
 
 
 typedef struct{
-    int x;
-    int y;
-} Player;
-
-
-typedef struct{
     int valeur;
     int murs;
     int robot;
