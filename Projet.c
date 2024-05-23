@@ -174,12 +174,34 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
 	    	    }
 	          i++;
 	      }
+		 int min = nbrmvmt[0];  
+		 for(int j= 0;j<(*nb_de_joueurs),j++){
+			 if(nbrmvmt[j]<min){
+				 min =nbrmvmt[j]
+					 }
+		 }
+
+
+			 
 		return nbrmvmt;
 	  }
 
-	int*Premier_joueur(int*nb_de_joueurs, int*nbrmvmt){
-	int i=0;
+	int Joueur_commence(int *nb_de_joueurs,int*nbrmvmt){
+	 Nombre_de_joueurs(nb_de_joueurs);
+	 Nombre_de_mouvement(nb_de_joueurs,nbrmvmt);
 
+	int i=0;
+	int min = nbrmvmt[0];  
+		 for(i= 0;i<(*nb_de_joueurs),i++){
+			 if(nbrmvmt[i]<min){
+				 min =nbrmvmt[i];
+			 }
+		 }
+	return min;
+	}
+//on appelle la foncion joueur commence dans le main et ensuite :
+//printf("celui qui a donnez %d comme nombre de mouvement commence",min);
+	
 
 
 int main(){
