@@ -404,7 +404,7 @@ int* nbDeMouvement(int nb_de_joueurs){
 		exit(5);
 	}
 
-    for(int i = 0; i < nb_de_joueurs; i++){
+    while(i < (nb_de_joueurs)){
 
         // Ici, on n'utilise pas notre fonction "scanf_int" car on a besoin d'écrire le numéro du joueur à chaque demande
         int ret_var = 0;
@@ -413,9 +413,28 @@ int* nbDeMouvement(int nb_de_joueurs){
             ret_var = scanf("%d", &nb_mvt[i]);
             while(getchar()!='\n'){} // Ligne facultative de sécurisation
         }
+        i++;
     }
     return nb_mvt;
 }
+
+
+
+int joueurCommence(int nb_de_joueurs, int* nb_mvt){
+	int i = 0;
+	int min = nb_mvt[0];  
+		for(i = 0; i < nb_de_joueurs; i++){
+		    if(nb_mvt[i] < min){
+			    min = nb_mvt[i];
+            }
+		}
+	return min;
+}
+//on appelle la foncion joueur commence dans le main et ensuite :
+//printf("celui qui a donnez %d comme nombre de mouvement commence",min);
+
+
+
 
 
 void afficheLesChoix(int cibleChoisie, int robotChoisi){
@@ -578,8 +597,12 @@ void manche(Case** tab_jeu, int* P_ligne, int* P_col, int* score, int nb_de_joue
     for(int i = 0; i < nb_de_joueurs; i++){
         printf("[%d] ", nb_mvt[i]);
     }
+    printf("\n");
 
     // Le joueurs avec le plus petit nombre est celui qui joue
+    int joueur = joueurCommence(nb_de_joueurs, nb_mvt);
+    printf("C'est le joueur %d qui joue.\n", joueur);
+    
 
     do{
         afficheJeu(tab_jeu, P_ligne, P_col);
