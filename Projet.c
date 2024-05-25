@@ -202,8 +202,8 @@ int move(Case** board, int* P_row, int* P_col, Player* P1){
 //on appelle la foncion joueur commence dans le main et ensuite :
 //printf("celui qui a donnez %d comme nombre de mouvement commence",min);
 	
-int Attri_de_points( int nb_deplacement; in* nb_mvt, int* score, int joueur, int nb_de_joueurs){
-    
+int* Attri_de_points( int nb_deplacement; in* nb_mvt, int* score, int joueur, int nb_de_joueurs){
+    	
         if(nb_deplacement>nb_mvt[joueur]){
             for(int i=0; i<nb_de_joueurs,i++){
                 if(i!= joueur){
@@ -214,9 +214,14 @@ int Attri_de_points( int nb_deplacement; in* nb_mvt, int* score, int joueur, int
             
         }
         else if(nb_deplacement == nb_mvt[joueur]){
+		score[joueur]= score[joueur] + 2;
             
         }
+	else if(nb_deplacement < nb_mvt[joueur]){
+		score[joueur]= score[joueur] - 1;
     }
+return score;
+}
 
 int main(){
     srand(time(NULL));
