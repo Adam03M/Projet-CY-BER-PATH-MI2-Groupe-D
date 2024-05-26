@@ -14,7 +14,7 @@ int main(void){
     }
 
     int resultat = 1;
-    int nb_de_manches = 1;
+    int nb_de_manches = 4;
     int max = 0;
     int i_max = 0;
     
