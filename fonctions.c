@@ -1,5 +1,5 @@
 #include "fonctions.h"
-
+#include "couleurs.h"
 
 // Code trouver dans le cours pour ces 2 fonctions
 // Permet d'utiliser scanf sans problèmes avec ce que l'utilisateur rentre
