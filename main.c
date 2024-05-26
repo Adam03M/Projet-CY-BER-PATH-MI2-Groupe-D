@@ -12,8 +12,6 @@ int main(void){
         printf("L'allocation de la mémoire pour le tableau des scores a échouée.\n");
         exit(1);
     }
-    
-    couleur("41");
 
     int resultat = 1;
     int nb_de_manches = 1;
