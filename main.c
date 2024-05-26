@@ -21,9 +21,9 @@ int main(void){
     
     for(int i = 1; i < nb_de_manches + 1; i++){
         // On lance une manche du jeu
-        printf("La prochaine manche commence dans 11 secondes.\n");
+        printf("La prochaine manche commence dans 15 secondes.\n");
         printf("C'est la %de manche.\n", i);
-        chronometre(11);
+        chronometre(15);
         resultat = manche(score, nb_de_joueurs);
         // Si tous les joueurs on estimés que la cible était inatteignable, on relance une manche sans la compter
         if (resultat == -1 || resultat == 0){
