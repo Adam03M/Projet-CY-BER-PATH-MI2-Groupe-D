@@ -384,7 +384,7 @@ void chronometre(int s){
 
 
 int nbDeJoueurs(){
-    int nb_de_joueurs = scanf_int("Donnez le nombre de joueurs pour cette partie.\n");
+    int nb_de_joueurs = scanf_int("Donnez le nombre de joueurs pour cette partie. (minimum 2)\n");
 	return nb_de_joueurs;
 }
 
@@ -417,8 +417,23 @@ int* nbDeMouvement(int nb_de_joueurs){
 
 // Cette fonction determine quel joueur joue
 int joueurCommence(int nb_de_joueurs, int* nb_mvt){
-	int min = nb_mvt[0];
-	int i_min = 0;
+    // On met le minimum très haut pour que les estimations des joueurs soient en dessous.
+    // Il n'est pas initialisé à nb_mvt[0] car si le 1er joueur rentre zéro cela pose problème pour calculer le minimum hors 0
+    int min = 0;
+    int i_min = 0;
+
+    for(int i = 0; i < nb_de_joueurs; i++){
+	    // On a besoin de vérifier si tous les joueurs on rentrer 0 avant de trouver le minimum
+		if(nb_mvt[i] > 0){
+			min = nb_mvt[i];
+            i_min = i;
+		}
+	}
+
+    if (min == 0){ // Si tous les joueurs on rentrés 0
+	    return -1;
+	}
+
 	for(int i = 0; i < nb_de_joueurs; i++){
 	    // On prend le minimum au dessus de 0, le minimum restera 0 seulement si tous les joueurs rentre 0
 		if((nb_mvt[i] < min) && (nb_mvt[i] > 0)){
@@ -426,9 +441,7 @@ int joueurCommence(int nb_de_joueurs, int* nb_mvt){
 			i_min = i;
 		}
 	}
-	if (min == 0){ // Si tous les joueurs on rentrés 0
-	    return -1;
-	}
+	
 	return i_min;
 }
 
@@ -640,7 +653,7 @@ int manche(int* score, int nb_de_joueurs){
 
     // Demande aux joueurs de rentrer leurs nombres de mouvements
     int* nb_mvt = nbDeMouvement(nb_de_joueurs);
-
+    
     // Le joueurs avec le plus petit nombre est celui qui joue
     int joueur = joueurCommence(nb_de_joueurs, nb_mvt);
     if (joueur == -1){
@@ -719,17 +732,14 @@ int main(){
     
     for(int i = 1; i < nb_de_manches + 1; i++){
         // On lance une manche du jeu
+        printf("La prochaine manche commence dans 11 secondes.\n");
+        printf("C'est la %de manche.\n", i);
+        chronometre(11);
         resultat = manche(score, nb_de_joueurs);
         // Si tous les joueurs on estimés que la cible était inatteignable, on relance une manche sans la compter
         if (resultat == -1 || resultat == 0){
             i--;
         }
-        couleur("47");
-        couleur("30");
-        printf("La prochaine manche commence dans 11 secondes.\n");
-        printf("C'est la %de manche.\n", i+1);
-        couleur("0");
-        chronometre(11);
     }
     
     // On affiche le joueur gagnant
