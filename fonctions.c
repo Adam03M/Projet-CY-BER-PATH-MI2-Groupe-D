@@ -318,7 +318,7 @@ int ChoixCible(Case** tab_jeu, int* P_row, int* P_col){
 }
 
 
-//Le programme va choisir un robot
+// Le programme va choisir un robot
 int ChoixRobot(Case** tab_jeu, int* P_row, int* P_col, int* coordXRobot, int* coordYRobot){
     int robotChoisi = rand() % 4 + 1; // La valeur en 1 et 4 pour choisir le robot
 
@@ -606,7 +606,7 @@ int manche(int* score, int nb_de_joueurs){
     creerCibles(tab_jeu, P_ligne, P_col); // Création des cibles
     creerRobots(tab_jeu, P_ligne, P_col); // Creation des robots
 
-    // On choisi la cible et le robot qui va jouer
+    // On choisi la cible et le robot qui vont être utilisés
     cibleChoisie = ChoixCible(tab_jeu, P_ligne, P_col);
 
     if (cibleChoisie <= 0){
@@ -625,8 +625,8 @@ int manche(int* score, int nb_de_joueurs){
     
     afficheJeu(tab_jeu, P_ligne, P_col); // Affiche le plateau
     
-    printf("Vous avez 20 secondes pour réfléchir\n");
-    chronometre(20); // On lance le chronomètre
+    printf("Vous avez 30 secondes pour réfléchir\n");
+    chronometre(30); // On lance le chronomètre
 
     // Demande aux joueurs de rentrer leurs nombres de mouvements
     int* nb_mvt = nbDeMouvement(nb_de_joueurs);
