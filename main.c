@@ -1,5 +1,5 @@
 #include "fonctions.h"
-
+#include "couleurs.h"
 
 int main(void){
     srand(time(NULL));
