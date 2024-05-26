@@ -1,17 +1,10 @@
 #ifndef FONCTIONS_H
 #define FONCTIONS_H
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
-
-#define suppr_ecran() printf("\033[H\033[2J")
-
-#define couleur(param) printf("\033[%sm",param)
-
 
 #define GAUCHE 1
 #define HAUT 2
